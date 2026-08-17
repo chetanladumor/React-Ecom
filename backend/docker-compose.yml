@@ -1,0 +1,201 @@
+version: '3.8'
+
+services:
+  auth-service:
+    build:
+      context: ./auth-service
+      dockerfile: Dockerfile
+    container_name: eshop-auth-service
+    ports:
+      - "5011:5011"
+    environment:
+      - PORT=5011
+      - NODE_ENV=production
+      - MONGO_URI=mongodb://admin:adminpassword@mongodb:27017/eshop_auth?authSource=admin
+      - RABBITMQ_URL=amqp://flipkart:flipkart123@rabbitmq:5672
+      - JWT_SECRET=eshop_super_secure_jwt_secret_key_12345
+    networks:
+      - dev_infra
+
+  product-service:
+    build:
+      context: ./product-service
+      dockerfile: Dockerfile
+    container_name: eshop-product-service
+    ports:
+      - "5012:5012"
+    environment:
+      - PORT=5012
+      - NODE_ENV=production
+      - MONGO_URI=mongodb://admin:adminpassword@mongodb:27017/eshop_product?authSource=admin
+      - REDIS_URL=redis://redis:6379
+      - RABBITMQ_URL=amqp://flipkart:flipkart123@rabbitmq:5672
+    networks:
+      - dev_infra
+
+  inventory-service:
+    build:
+      context: ./inventory-service
+      dockerfile: Dockerfile
+    container_name: eshop-inventory-service
+    ports:
+      - "5013:5013"
+    environment:
+      - PORT=5013
+      - NODE_ENV=production
+      - MONGO_URI=mongodb://admin:adminpassword@mongodb:27017/eshop_inventory?authSource=admin
+      - RABBITMQ_URL=amqp://flipkart:flipkart123@rabbitmq:5672
+    networks:
+      - dev_infra
+
+  cart-service:
+    build:
+      context: ./cart-service
+      dockerfile: Dockerfile
+    container_name: eshop-cart-service
+    ports:
+      - "5014:5014"
+    environment:
+      - PORT=5014
+      - NODE_ENV=production
+      - MONGO_URI=mongodb://admin:adminpassword@mongodb:27017/eshop_cart?authSource=admin
+    networks:
+      - dev_infra
+
+  order-service:
+    build:
+      context: ./order-service
+      dockerfile: Dockerfile
+    container_name: eshop-order-service
+    ports:
+      - "5015:5015"
+    environment:
+      - PORT=5015
+      - NODE_ENV=production
+      - MONGO_URI=mongodb://admin:adminpassword@mongodb:27017/eshop_order?authSource=admin
+      - RABBITMQ_URL=amqp://flipkart:flipkart123@rabbitmq:5672
+    networks:
+      - dev_infra
+
+  wishlist-service:
+    build:
+      context: ./wishlist-service
+      dockerfile: Dockerfile
+    container_name: eshop-wishlist-service
+    ports:
+      - "5016:5016"
+    environment:
+      - PORT=5016
+      - NODE_ENV=production
+      - MONGO_URI=mongodb://admin:adminpassword@mongodb:27017/eshop_wishlist?authSource=admin
+    networks:
+      - dev_infra
+
+  payment-service:
+    build:
+      context: ./payment-service
+      dockerfile: Dockerfile
+    container_name: eshop-payment-service
+    ports:
+      - "5017:5017"
+    environment:
+      - PORT=5017
+      - NODE_ENV=production
+      - MONGO_URI=mongodb://admin:adminpassword@mongodb:27017/eshop_payment?authSource=admin
+      - RABBITMQ_URL=amqp://flipkart:flipkart123@rabbitmq:5672
+    networks:
+      - dev_infra
+
+  notification-service:
+    build:
+      context: ./notification-service
+      dockerfile: Dockerfile
+    container_name: eshop-notification-service
+    ports:
+      - "5018:5018"
+    environment:
+      - PORT=5018
+      - NODE_ENV=production
+      - RABBITMQ_URL=amqp://flipkart:flipkart123@rabbitmq:5672
+    networks:
+      - dev_infra
+
+  review-service:
+    build:
+      context: ./review-service
+      dockerfile: Dockerfile
+    container_name: eshop-review-service
+    ports:
+      - "5019:5019"
+    environment:
+      - PORT=5019
+      - NODE_ENV=production
+      - MONGO_URI=mongodb://admin:adminpassword@mongodb:27017/eshop_review?authSource=admin
+      - RABBITMQ_URL=amqp://flipkart:flipkart123@rabbitmq:5672
+    networks:
+      - dev_infra
+
+  admin-service:
+    build:
+      context: ./admin-service
+      dockerfile: Dockerfile
+    container_name: eshop-admin-service
+    ports:
+      - "5020:5020"
+    environment:
+      - PORT=5020
+      - NODE_ENV=production
+      - MONGO_URI=mongodb://admin:adminpassword@mongodb:27017/eshop_admin?authSource=admin
+    networks:
+      - dev_infra
+
+  api-gateway:
+    build:
+      context: ./api-gateway
+      dockerfile: Dockerfile
+    container_name: eshop-api-gateway
+    ports:
+      - "5010:5010"
+    environment:
+      - PORT=5010
+      - NODE_ENV=production
+      - AUTH_SERVICE_URL=http://eshop-auth-service:5011
+      - CORS_ORIGIN=http://localhost:5110
+      - PRODUCT_SERVICE_URL=http://eshop-product-service:5012
+      - INVENTORY_SERVICE_URL=http://eshop-inventory-service:5013
+      - CART_SERVICE_URL=http://eshop-cart-service:5014
+      - ORDER_SERVICE_URL=http://eshop-order-service:5015
+      - WISHLIST_SERVICE_URL=http://eshop-wishlist-service:5016
+      - REVIEW_SERVICE_URL=http://eshop-review-service:5019
+      - ADMIN_SERVICE_URL=http://eshop-admin-service:5020
+      - JWT_SECRET=eshop_super_secure_jwt_secret_key_12345
+    depends_on:
+      - auth-service
+      - product-service
+      - inventory-service
+      - cart-service
+      - order-service
+      - wishlist-service
+      - review-service
+      - admin-service
+    networks:
+      - dev_infra
+
+  frontend:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+      args:
+        - VITE_API_URL=http://localhost:5010/api/v1
+    container_name: eshop-frontend
+    ports:
+      - "5110:80"
+    depends_on:
+      - api-gateway
+    networks:
+      - dev_infra
+
+networks:
+  dev_infra:
+    external: true
+    name: dev-infrastructure_default

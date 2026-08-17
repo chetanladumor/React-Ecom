@@ -74,12 +74,12 @@ export default defineConfig([
 
 RUN project:
 
-This will spin up the database, all the backend microservices, the API Gateway, and the frontend application.
+This will start the backend microservices, the API Gateway, and the frontend application using your shared dev-infrastructure.
 
 cd backend
 docker compose up -d
 
-http://localhost:8080/
+http://localhost:5110/
 
 To stop everything:
 
@@ -97,30 +97,32 @@ docker compose up -d --build
 When you run docker compose up -d in the backend/ directory, it starts a total of 15 services, which can be grouped into 4 main categories:
 
 1. The Frontend Application
-   frontend (Port 8080): The React web application that you interact with in your browser.
+   frontend (Port 5110): The React web application that you interact with in your browser.
 2. The API Gateway
-   api-gateway (Port 3000): The entry point for all frontend requests. It handles CORS, rate limiting, and routes incoming traffic to the correct backend microservice.
+   api-gateway (Port 5010): The entry point for all frontend requests. It handles CORS, rate limiting, and routes incoming traffic to the correct backend microservice.
 3. Core Backend Microservices
    These handle the actual business logic of the e-commerce platform:
 
-auth-service (Port 3001): Handles user registration, login, and JWT tokens.
-product-service (Port 3002): Manages the product catalog, categories, and details.
-inventory-service (Port 3003): Tracks stock levels and product availability.
-cart-service (Port 3004): Manages the user's shopping cart.
-order-service (Port 3005): Processes checkout and order creation.
-wishlist-service (Port 3006): Stores the user's saved items.
-payment-service (Port 3007): Handles mock payment processing.
-notification-service (Port 3008): Responsible for sending alerts or emails (often listens to RabbitMQ).
-review-service (Port 3009): Handles product reviews and ratings.
-admin-service (Port 3010): Provides administrative capabilities (e.g., managing users or products). 4. Infrastructure & Databases
-These are the foundational technologies that support the microservices:
+auth-service (Port 5011): Handles user registration, login, and JWT tokens.
+product-service (Port 5012): Manages the product catalog, categories, and details.
+inventory-service (Port 5013): Tracks stock levels and product availability.
+cart-service (Port 5014): Manages the user's shopping cart.
+order-service (Port 5015): Processes checkout and order creation.
+wishlist-service (Port 5016): Stores the user's saved items.
+payment-service (Port 5017): Handles mock payment processing.
+notification-service (Port 5018): Responsible for sending alerts or emails (often listens to RabbitMQ).
+review-service (Port 5019): Handles product reviews and ratings.
+admin-service (Port 5020): Provides administrative capabilities (e.g., managing users or products). 4. Infrastructure & Databases
+4. Infrastructure & Databases
+These are the foundational technologies that support the microservices, connected via the external `dev-infrastructure_default` network:
 
-mongodb (Port 27018): The NoSQL database used to store all application data (users, products, orders, etc.).
-redis (Port 6380): An in-memory data store used for fast caching (e.g., caching products or cart data).
-rabbitmq (Ports 5672 / 15672): The message broker that allows the microservices to communicate with each other asynchronously (e.g., the order-service telling the notification-service to send an email).
-All of these are automatically wired together to communicate securely over an internal Docker network (eshop-network).
+mongodb (Port 27017): The NoSQL database used to store all application data (users, products, orders, etc.).
+redis (Port 6379): An in-memory data store used for fast caching (e.g., caching products or cart data).
+rabbitmq (Ports 5672 / 15672): The message broker that allows the microservices to communicate with each other asynchronously.
 
-The API Gateway acts as the central entry point (a "reverse proxy") for all requests coming from the frontend. Instead of the frontend trying to communicate directly with 10 different backend microservices on 10 different ports, it sends all requests to the Gateway on Port 3000. The Gateway then handles security, authentication, and forwards (proxies) the request to the correct microservice.
+All of these are automatically wired together to communicate securely over the internal Docker network.
+
+The API Gateway acts as the central entry point (a "reverse proxy") for all requests coming from the frontend. Instead of the frontend trying to communicate directly with 10 different backend microservices on 10 different ports, it sends all requests to the Gateway on Port 5010. The Gateway then handles security, authentication, and forwards (proxies) the request to the correct microservice.
 
 Here is a complete overview of how it works and where the code is located:
 
@@ -134,7 +136,7 @@ Authentication (authMiddleware): Validates incoming JWT tokens globally and atta
 Logging (loggerMiddleware): Generates a unique correlationId for every request to trace it across the distributed microservices. 2. The Configuration Manager (backend/api-gateway/src/config/gateway.config.ts)
 This file consolidates all the environment variables and target URLs.
 
-It maps names like config.services.auth to the internal Docker network URL (http://eshop-auth-service:3001).
+It maps names like config.services.auth to the internal Docker network URL (http://eshop-auth-service:5011).
 This allows the Gateway to know exactly where to send traffic for a specific service. 3. The Reverse Proxy Router (backend/api-gateway/src/routes/proxy.routes.ts)
 This is where the actual forwarding happens using a library called http-proxy-middleware. All traffic that hits /api/v1/... goes through this router.
 
@@ -142,7 +144,7 @@ How it routes traffic:
 
 A request to /api/v1/products is intercepted by the proxy.
 The proxy checks its table, sees that /products should go to config.services.product.
-It rewrites the path (strips out /api/v1/products) and forwards the raw network stream to http://eshop-product-service:3002.
+It rewrites the path (strips out /api/v1/products) and forwards the raw network stream to http://eshop-product-service:5012.
 Header Propagation (Important!): Because the Gateway handles authentication centrally, the individual microservices don't need to verify JWT tokens. Instead, the proxy intercepts the request and injects trusted downstream headers before forwarding it to the internal network:
 
 typescript
@@ -158,11 +160,11 @@ proxyReq.setHeader('x-correlation-id', req.correlationId);
 }
 }
 Summary of the Flow
-User clicks "Login" on the frontend (http://localhost:8080).
-Frontend sends a POST request to http://localhost:3000/api/v1/auth/login.
+User clicks "Login" on the frontend (http://localhost:5110).
+Frontend sends a POST request to http://localhost:5010/api/v1/auth/login.
 The request hits index.ts, passes CORS and Rate Limiting.
 The request hits proxy.routes.ts.
-The proxy forwards the payload securely to the internal Docker container at http://eshop-auth-service:3001/login.
+The proxy forwards the payload securely to the internal Docker container at http://eshop-auth-service:5011/login.
 This design pattern is incredibly powerful because it centralizes security and configuration, making your microservices smaller and easier to manage!
 
 RabbitMQ:

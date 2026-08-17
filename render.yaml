@@ -1,0 +1,191 @@
+services:
+  # ------------------------------------------------------------
+  # PUBLIC SERVICES
+  # ------------------------------------------------------------
+  - type: web
+    name: ecom-frontend
+    env: docker
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: VITE_API_URL
+        # Update this in the Render Dashboard after the API Gateway is deployed
+        value: https://ecom-api-gateway.onrender.com/api/v1
+
+  - type: web
+    name: ecom-api-gateway
+    env: docker
+    dockerContext: ./backend
+    dockerfilePath: ./api-gateway/Dockerfile
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: JWT_SECRET
+        sync: false
+      - key: CORS_ORIGIN
+        # Update this in the Render Dashboard after Frontend is deployed
+        value: https://ecom-frontend.onrender.com
+      - key: AUTH_SERVICE_URL
+        value: http://ecom-auth-service:5011
+      - key: PRODUCT_SERVICE_URL
+        value: http://ecom-product-service:5012
+      - key: INVENTORY_SERVICE_URL
+        value: http://ecom-inventory-service:5013
+      - key: CART_SERVICE_URL
+        value: http://ecom-cart-service:5014
+      - key: ORDER_SERVICE_URL
+        value: http://ecom-order-service:5015
+      - key: WISHLIST_SERVICE_URL
+        value: http://ecom-wishlist-service:5016
+      - key: REVIEW_SERVICE_URL
+        value: http://ecom-review-service:5019
+      - key: ADMIN_SERVICE_URL
+        value: http://ecom-admin-service:5020
+
+  # ------------------------------------------------------------
+  # PRIVATE MICROSERVICES
+  # ------------------------------------------------------------
+  - type: pserv
+    name: ecom-auth-service
+    env: docker
+    dockerContext: ./backend
+    dockerfilePath: ./auth-service/Dockerfile
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 5011
+      - key: JWT_SECRET
+        sync: false
+      - key: MONGO_URI
+        sync: false
+      - key: RABBITMQ_URL
+        sync: false
+
+  - type: pserv
+    name: ecom-product-service
+    env: docker
+    dockerContext: ./backend
+    dockerfilePath: ./product-service/Dockerfile
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 5012
+      - key: MONGO_URI
+        sync: false
+      - key: REDIS_URL
+        sync: false
+      - key: RABBITMQ_URL
+        sync: false
+
+  - type: pserv
+    name: ecom-inventory-service
+    env: docker
+    dockerContext: ./backend
+    dockerfilePath: ./inventory-service/Dockerfile
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 5013
+      - key: MONGO_URI
+        sync: false
+      - key: RABBITMQ_URL
+        sync: false
+
+  - type: pserv
+    name: ecom-cart-service
+    env: docker
+    dockerContext: ./backend
+    dockerfilePath: ./cart-service/Dockerfile
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 5014
+      - key: MONGO_URI
+        sync: false
+
+  - type: pserv
+    name: ecom-order-service
+    env: docker
+    dockerContext: ./backend
+    dockerfilePath: ./order-service/Dockerfile
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 5015
+      - key: MONGO_URI
+        sync: false
+      - key: RABBITMQ_URL
+        sync: false
+
+  - type: pserv
+    name: ecom-wishlist-service
+    env: docker
+    dockerContext: ./backend
+    dockerfilePath: ./wishlist-service/Dockerfile
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 5016
+      - key: MONGO_URI
+        sync: false
+
+  - type: pserv
+    name: ecom-payment-service
+    env: docker
+    dockerContext: ./backend
+    dockerfilePath: ./payment-service/Dockerfile
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 5017
+      - key: MONGO_URI
+        sync: false
+      - key: RABBITMQ_URL
+        sync: false
+
+  - type: pserv
+    name: ecom-notification-service
+    env: docker
+    dockerContext: ./backend
+    dockerfilePath: ./notification-service/Dockerfile
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 5018
+      - key: RABBITMQ_URL
+        sync: false
+
+  - type: pserv
+    name: ecom-review-service
+    env: docker
+    dockerContext: ./backend
+    dockerfilePath: ./review-service/Dockerfile
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 5019
+      - key: MONGO_URI
+        sync: false
+      - key: RABBITMQ_URL
+        sync: false
+
+  - type: pserv
+    name: ecom-admin-service
+    env: docker
+    dockerContext: ./backend
+    dockerfilePath: ./admin-service/Dockerfile
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 5020
+      - key: MONGO_URI
+        sync: false

@@ -3,7 +3,7 @@
  * @description Application bootstrap component setting up Redux, Routing, and global UI containers.
  *
  * @why-it-exists
- * Binds all global providers (Redux Store Provider, React Router Context Provider) and mounts the route tree 
+ * Binds all global providers (Redux Store Provider, React Router Context Provider) and mounts the route tree
  * along with global visual portals (like Toast notifications).
  *
  * @why-this-approach
@@ -12,11 +12,11 @@
  * - Mounts our global `<ToastContainer />` for notifications.
  *
  * @alternative-approaches
- * - Defining providers in `src/main.tsx`: Also possible, but placing them in App.tsx makes it easier to write 
+ * - Defining providers in `src/main.tsx`: Also possible, but placing them in App.tsx makes it easier to write
  *   integration wrappers when building tests for the entire application environment.
  *
  * @enterprise-considerations
- * - Theme Initialization: Triggers an effect reading the Redux theme state to synchronize class names on 
+ * - Theme Initialization: Triggers an effect reading the Redux theme state to synchronize class names on
  *   the document head, avoiding flash-of-unstyled-content (FOUC).
  */
 
@@ -54,3 +54,5 @@ export default function App() {
     </Provider>
   );
 }
+
+// Test AI Reviewer Trigger

@@ -6,6 +6,7 @@ services:
       context: ./auth-service
       dockerfile: Dockerfile
     container_name: eshop-auth-service
+    restart: unless-stopped
     ports:
       - "5011:5011"
     environment:
@@ -22,6 +23,7 @@ services:
       context: ./product-service
       dockerfile: Dockerfile
     container_name: eshop-product-service
+    restart: unless-stopped
     ports:
       - "5012:5012"
     environment:
@@ -38,6 +40,7 @@ services:
       context: ./inventory-service
       dockerfile: Dockerfile
     container_name: eshop-inventory-service
+    restart: unless-stopped
     ports:
       - "5013:5013"
     environment:
@@ -53,6 +56,7 @@ services:
       context: ./cart-service
       dockerfile: Dockerfile
     container_name: eshop-cart-service
+    restart: unless-stopped
     ports:
       - "5014:5014"
     environment:
@@ -67,6 +71,7 @@ services:
       context: ./order-service
       dockerfile: Dockerfile
     container_name: eshop-order-service
+    restart: unless-stopped
     ports:
       - "5015:5015"
     environment:
@@ -82,6 +87,7 @@ services:
       context: ./wishlist-service
       dockerfile: Dockerfile
     container_name: eshop-wishlist-service
+    restart: unless-stopped
     ports:
       - "5016:5016"
     environment:
@@ -96,6 +102,7 @@ services:
       context: ./payment-service
       dockerfile: Dockerfile
     container_name: eshop-payment-service
+    restart: unless-stopped
     ports:
       - "5017:5017"
     environment:
@@ -111,6 +118,7 @@ services:
       context: ./notification-service
       dockerfile: Dockerfile
     container_name: eshop-notification-service
+    restart: unless-stopped
     ports:
       - "5018:5018"
     environment:
@@ -125,6 +133,7 @@ services:
       context: ./review-service
       dockerfile: Dockerfile
     container_name: eshop-review-service
+    restart: unless-stopped
     ports:
       - "5019:5019"
     environment:
@@ -140,6 +149,7 @@ services:
       context: ./admin-service
       dockerfile: Dockerfile
     container_name: eshop-admin-service
+    restart: unless-stopped
     ports:
       - "5020:5020"
     environment:
@@ -154,6 +164,7 @@ services:
       context: ./api-gateway
       dockerfile: Dockerfile
     container_name: eshop-api-gateway
+    restart: unless-stopped
     ports:
       - "5010:5010"
     environment:
@@ -188,6 +199,7 @@ services:
       args:
         - VITE_API_URL=http://localhost:5010/api/v1
     container_name: eshop-frontend
+    restart: unless-stopped
     ports:
       - "5110:80"
     depends_on:
